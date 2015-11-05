@@ -2,7 +2,15 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    
     concat: {
+      options: {
+            separator: ';',
+          },
+          dist: {
+            src: ['public/client/app.js', 'public/client/link.js', 'public/client/links.js','public/client/linkView.js','public/client/linksView.js','public/client/createLinkView.js','public/client/router.js'],
+            dest: 'public/dist/built.js',
+          },
     },
 
     mochaTest: {
@@ -21,24 +29,33 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      my_target: {
+            files: {
+              'public/dist/built.min.js': ['public/dist/built.js']
+            }
+          }
     },
 
     jshint: {
-      files: [
-        // Add filespec list here
-      ],
       options: {
         force: 'true',
         jshintrc: '.jshintrc',
         ignores: [
           'public/lib/**/*.js',
-          'public/dist/**/*.js'
+          'public/dist/**/*.js',
+          'node_modules/**/*'
         ]
-      }
+      },
+      all: ['../2015-10-shortly-deploy/**/*.js']
     },
 
     cssmin: {
         // Add filespec list here
+      my_target: {
+            files: {
+              'public/style.min.css': ['public/style.css']
+            }
+          }
     },
 
     watch: {
@@ -59,7 +76,13 @@ module.exports = function(grunt) {
     },
 
     shell: {
-      prodServer: {
+      multiple: {
+        command: [
+            'azure site scale mode standard alshortly',
+            'git push azure master',
+            'azure site browse',
+            'azure site scale mode free alshortly'
+        ].join('&&')
       }
     },
   });
@@ -91,23 +114,31 @@ module.exports = function(grunt) {
   ////////////////////////////////////////////////////
 
   grunt.registerTask('test', [
-    'mochaTest'
+    'mochaTest', 'jshint'
   ]);
 
   grunt.registerTask('build', [
+    'concat', 'cssmin', 'uglify'
   ]);
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
       // add your production server task here
+      grunt.task.run(['shell']);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
-  grunt.registerTask('deploy', [
+  grunt.registerTask('deploy', function(n) {
       // add your production server task here
-  ]);
+      if(grunt.option('prod')){
+        grunt.task.run(['test', 'build', 'shell'])        
+      }else{
+        grunt.task.run(['test', 'server-dev'])
+      }
+
+  });
 
 
 };
