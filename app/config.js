@@ -5,8 +5,11 @@ var crypto = require('crypto');
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
 
-var host = process.env.host || '127.0.0.1';
 
+//mongo URI: mongodb://MongoLab-c:cnc8Hxo5LglLCo3s5fJbbI_.8CRjQqZSa08klgCzIok-@ds048878.mongolab.com:48878/MongoLab-c
+
+// var host = process.env.mongo || 'mongodb://127.0.0.1/shortly';
+var host = mondodb || 'mongodb://127.0.0.1/shortly';
 var Schema = mongoose.Schema;
 
   var urlSchema = new Schema({
@@ -23,6 +26,18 @@ var Schema = mongoose.Schema;
     password: { type: String },
     date  :  { type: Date, default: Date.now }
   });  
+
+  urlSchema.pre('save', function(next) {
+    this.initialize();
+    next();
+  }, this);
+
+  userSchema.pre('save', function(next) {
+    console.log('presave userSchema');
+    this.hashPassword().then(function(){
+      next();
+    });
+  }, this);
 
   userSchema.methods.comparePassword = function(attemptedPassword, callback) {
     bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
@@ -46,5 +61,5 @@ var Schema = mongoose.Schema;
 
 var User = mongoose.model('User', userSchema);
 var Url = mongoose.model('Url', urlSchema); 
-mongoose.connect('mongodb://127.0.0.1/shortly');
+mongoose.connect(host);
 module.exports = { User: User, Url: Url };

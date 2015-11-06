@@ -4,17 +4,17 @@ var expect = require('chai').expect;
 var app = require('../server-config.js');
 
 var db = require('../app/config');
-var User = require('../app/models/user');
-var Link = require('../app/models/link');
+
 
 /////////////////////////////////////////////////////
 // NOTE: these tests are designed for mongo!
 /////////////////////////////////////////////////////
 
-var User = require('../app/models/user');
-var Link = require('../app/models/link');
-('', function() {
+var User = require('../app/config').User;
+var Link = require('../app/config').Url;
+console.log('inside the tests');
 
+('', function() {
   beforeEach(function(done) {
     // Log out currently signed in user
     request(app)
@@ -31,7 +31,7 @@ var Link = require('../app/models/link');
   });
 
   describe('Link creation: ', function() {
-
+    // console.log('inside the tests');
     it('Only shortens valid urls, returning a 404 - Not found for invalid urls', function(done) {
       request(app)
         .post('/links')
@@ -99,7 +99,6 @@ var Link = require('../app/models/link');
           base_url: 'http://127.0.0.1:4568',
           visits: 0
         })
-
         link.save(function() {
           done();
         });
@@ -218,6 +217,7 @@ var Link = require('../app/models/link');
       });
     });
 
+
     it('Logs in existing users', function(done) {
       request(app)
         .post('/login')
@@ -246,4 +246,4 @@ var Link = require('../app/models/link');
 
   }); // Account Login
 
-});
+}());

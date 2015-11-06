@@ -79,9 +79,13 @@ module.exports = function(grunt) {
       multiple: {
         command: [
             'azure site scale mode standard alshortly',
-            'git push azure master',
-            'azure site browse',
-            'azure site scale mode free alshortly'
+            'echo site scaled up',
+            'git push alshortly master',
+            'echo git pushed',
+            'azure site browse alshortly',
+            'echo site launched in browser',
+            'azure site scale mode free alshortly',
+            'echo scaled down'
         ].join('&&')
       }
     },
